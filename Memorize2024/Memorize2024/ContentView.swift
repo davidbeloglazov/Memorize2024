@@ -13,15 +13,42 @@ import SwiftUI
 struct ContentView: View { // protocol oriented programming, behaves like a View
 //    let emojis: Array<String> = ["👻", "🎃", "🕷️", "😈"]
 //    let emojis: [String] = ["👻", "🎃", "🕷️", "😈"]
-    let emojis = ["👻", "🎃", "🕷️", "😈"]
+    let emojis = ["👻", "🎃", "🕷️", "😈", "🧟", "🦇", "🕸️", "🧛", "🌙", "🧙", "🍬", "🔮"]
+    @State var cardCount = 4
     var body: some View { // of type some View, a computed property
-        HStack {
-            ForEach(emojis.indices, id:\.self) { index in
+        VStack {
+            cards
+            cardCountAdjusters
+        }
+        .padding()
+    }
+    
+    func cardCountAdjuster(by offset: Int, symbol: String) -> some View {
+        Button {
+            cardCount += offset
+        } label: {
+            Image(systemName: symbol)
+        }
+        .disabled(cardCount + offset < 1 || cardCount + offset > emojis.count)
+    }
+    
+    var cards: some View {
+        HStack { // implicit return
+            ForEach(0..<cardCount, id:\.self) { index in
                 CardView(content: emojis[index])
             }
         }
         .foregroundColor(.orange)
-        .padding()
+    }
+    
+    var cardCountAdjusters: some View{
+        HStack{
+            cardCountAdjuster(by: -1, symbol: "rectangle.stack.badge.minus.fill")
+            Spacer()
+            cardCountAdjuster(by: +1, symbol: "rectangle.stack.badge.plus.fill")
+        }
+        .imageScale(.large)
+        .font(.largeTitle)
     }
 }
 
