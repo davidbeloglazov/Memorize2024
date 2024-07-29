@@ -16,11 +16,17 @@ struct ContentView: View { // protocol oriented programming, behaves like a View
     let emojis = ["👻", "🎃", "🕷️", "😈", "🧟", "🦇", "🕸️", "🧛", "🌙", "🧙", "🍬", "🔮"]
     @State var cardCount = 4
     var body: some View { // of type some View, a computed property
-        VStack {
-            cards
-            cardCountAdjusters
+        ZStack {
+            ScrollView {
+                cards
+            }
+            VStack {
+                Spacer()
+                cardCountAdjusters
+            }
+            .padding()
         }
-        .padding()
+//        .padding()
     }
     
     func cardCountAdjuster(by offset: Int, symbol: String) -> some View {
@@ -33,9 +39,10 @@ struct ContentView: View { // protocol oriented programming, behaves like a View
     }
     
     var cards: some View {
-        HStack { // implicit return
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 120)), GridItem(.adaptive(minimum: 120)), GridItem(.adaptive(minimum: 120))]) { // implicit return
             ForEach(0..<cardCount, id:\.self) { index in
                 CardView(content: emojis[index])
+                    .aspectRatio(2/3, contentMode: .fit)
             }
         }
         .foregroundColor(.orange)
@@ -58,14 +65,12 @@ struct CardView: View {
     var body: some View { // only lets in View because it's read-only
         ZStack { // trailing closure syntax
             let base = RoundedRectangle(cornerRadius: 12) // type inference
-            if isFaceUp{
+            Group {
                 base.fill(.white)
                 base.strokeBorder(lineWidth: 2)
                 Text(content).font(.largeTitle)
-            } else {
-                base.fill()
-            }
-            
+            }.opacity(isFaceUp ? 1 : 0)
+            base.fill().opacity(isFaceUp ? 0 : 1)
         }.onTapGesture {
 //            print("tapped")
 //            isFaceUp = !isFaceUp
